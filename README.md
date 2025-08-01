@@ -3,7 +3,7 @@
 ![Workflow Status](https://github.com/software-students-fall2023/5-final-project-mostly_afk/actions/workflows/client.yml/badge.svg?branch=main&kill_cache=1)
 ![Workflow Status](https://github.com/software-students-fall2023/5-final-project-mostly_afk/actions/workflows/ci-cd.yml/badge.svg?branch=main&kill_cache=1)
 
-# TikTalk
+# PersonaVerse
 
 An exercise to put to practice software development teamwork, subsystem communication, containers, deployment, and CI/CD pipelines. See [instructions](./instructions.md) for details.
 
@@ -17,7 +17,7 @@ An exercise to put to practice software development teamwork, subsystem communic
 
 ## Description: 
 
-TikTalk is a creative web application that allows users to engage in conversations with a variety of AI chatbots, each boasting a unique personality, from a helpful mom to a mysterious vampire. The app features an intuitive chat interface, enabling users to select different AI personalities and view their chat histories and express themselves to all sorts of personalities!
+PersonaVerse is a creative web application that allows users to engage in conversations with a variety of AI chatbots, each boasting a unique personality, from a helpful mom to a mysterious vampire. The app features an intuitive chat interface, enabling users to select different AI personalities and view their chat histories and express themselves to all sorts of personalities!
 
 ## Setup Locally: 
 
