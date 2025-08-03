@@ -5,7 +5,6 @@
 
 # PersonaVerse
 
-## [Live Demo](http://159.65.44.240:5001/)
 PersonaVerse is a creative web application that allows users to engage in conversations with a variety of AI chatbots, each boasting a unique personality, from a helpful mom to a mysterious vampire. The app features an intuitive chat interface, enabling users to select different AI personalities and view their chat histories and express themselves to all sorts of personalities!
 
 ## Team: 
@@ -46,17 +45,17 @@ print(secrets.token_hex(32))
 
 Then put it in 
 
-4. Build docker images and run the containers:
+5. Build docker images and run the containers:
 ```
 docker compose up --build -d
 ```
 
-5. Open the application in your browser:
+6. Open the application in your browser:
 ```
 http://localhost:5001
 ```
 
-6. To stop the containers, run the command: 
+7. To stop the containers, run the command: 
 ```
 docker-compose stop
 ```
@@ -69,3 +68,10 @@ docker-compose stop
   - `chat` - stores conversation history
 - **Setup**: Collections are created automatically when the application starts
 - **Access**: You can view the database using MongoDB Compass by connecting to `mongodb://localhost:27017`
+
+## Docker Hub
+You can pull the images for the client and webapp through the following commands: 
+```
+docker pull awesomeadi00/personaverse-webapp
+docker pull awesomeadi00/personaverse-client
+```

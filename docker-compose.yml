@@ -3,7 +3,7 @@ services:
     build:
       context: ./web_app
       dockerfile: Dockerfile
-    image: awesomeadi00/webapp:latest
+    image: awesomeadi00/personaverse-webapp:latest
     container_name: personaverse-webapp-container
     ports:
       - "5001:5000"
@@ -11,12 +11,13 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    image: awesomeadi00/client:latest
+    image: awesomeadi00/personaverse-client:latest
     container_name: personaverse-client-container
     ports:
       - "5002:5002"
   database:
     image: mongo:4.2
+    container_name: personaverse-database-container
     ports:
       - "27017:27017"
     volumes:
