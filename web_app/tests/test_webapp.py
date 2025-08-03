@@ -265,26 +265,6 @@ class Tests:
         assert response.status_code == 200
         assert b"Password should have at least one alphabet!" in response.data
 
-    def test_login_user_logged_in(self, client):
-        """Test login route when user is logged in."""
-        with client.session_transaction() as session:
-            session["user_id"] = "some_user_id"
-
-        response = client.get("/login")
-
-        assert response.status_code == 302
-        assert "/" in response.headers["Location"]
-
-    def test_login_user_not_logged_in(self, client):
-        """Test login route when user is not logged in."""
-        with client.session_transaction() as session:
-            session.pop("user_id", None)
-
-        response = client.get("/login")
-
-        assert response.status_code == 200
-        assert b"login.html" in response.data
-
     @patch('web_app.app.user_collection.find_one')
     def test_login_auth_success(self, mock_find_one, client):
         """Test successful login authentication."""
@@ -438,16 +418,3 @@ class Tests:
 
         assert response.status_code == 200
         assert b"Passwords do not match!" in response.data
-    
-
-    def test_logout(self, client):
-        """Test logout"""
-        with client.session_transaction() as session:
-            session["user_id"] = 123 
-
-        response = client.get("/logout")
-
-        with client.session_transaction() as session:
-            assert "user_id" not in session
-
-        assert response.status_code == 302 

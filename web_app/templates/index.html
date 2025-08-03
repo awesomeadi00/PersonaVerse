@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Chat</title>
+    <title>PersonaVerse - AI Chat with Personalities</title>
+    <link rel="icon" type="image/png" href="static/favicon.png">
     <link rel="stylesheet" type="text/css" href="static/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Chat with AI personalities - from helpful moms to mysterious vampires">
 </head>
 
 <body onload="document.getElementById('user_input').focus();">
     <header>
-        <h1>TikTalk</h1>
+        <h1>PersonaVerse</h1>
         <div class="user-dropdown">
-            <button class="dropbtn-menu"><span class="hamburger-icon">&#9776;</span></button>
+            <button class="dropbtn-menu">
+                <span class="hamburger-icon">☰</span>
+                <span>Menu</span>
+            </button>
             <div class="dropdown-content-user">
                 {% if 'user_id' in session %}
                 <a href="{{ url_for('logout') }}">Log Out</a>
@@ -28,14 +33,14 @@
         <div class="modal-content">
             <span class="close">&times;</span>
             <p>Are you sure you want to clear your chat?</p>
-            <button id="confirm-clear">Yes</button>
-            <button id="cancel-clear">No</button>
+            <button id="confirm-clear" class="button">Yes</button>
+            <button id="cancel-clear" class="button">No</button>
         </div>
     </div>
 
     <div class="app-container">
         <div class="sidebar">
-            <div class="sidebar-item" data-personality="Helpful Mom">
+            <div class="sidebar-item active" data-personality="Helpful Mom">
                 <img class="sidebar-icon" src="../static/images/helpful.png" alt="Helpful Mom">
                 <span class="sidebar-text">Helpful Mom</span>
             </div>
@@ -68,8 +73,9 @@
                 <span class="sidebar-text">Charming Rogue</span>
             </div>
         </div>
+        
         <div class="dropdown">
-            <button class="dropbtn">Personality Options <span class="dropdown-icon">&#9662;</span></button>
+            <button class="dropbtn">Choose Personality <span class="dropdown-icon">▼</span></button>
             <div class="dropdown-content">
                 <a href="#" data-personality="Helpful Mom">Helpful Mom</a>
                 <a href="#" data-personality="Unhelpful Angsty Teen">Unhelpful Angsty Teen</a>
@@ -81,32 +87,60 @@
                 <a href="#" data-personality="Charming Rogue">Charming Rogue</a>
             </div>
         </div>
+        
         <main class="chat-container" role="main">
             <div class="chat-header">
                 <div class="chat-title">Helpful Mom</div>
             </div>
+            
             <section class="chat-box" aria-label="Chat messages" aria-live="polite">
                 {% if messages %}
                 {% for msg in messages %}
                 <div class="message {% if msg.type == 'User' %}user{% else %}ai{% endif %}">
-                    {{ msg.content }}
+                    <div class="message-content">
+                        {{ msg.content }}
+                    </div>
                 </div>
                 {% endfor %}
                 {% endif %}
             </section>
+            
             <form method="POST" class="message-form" aria-label="Send a message">
-                <input type="text" id="user_input" name="user_input" placeholder="Write your message here..."
-                    class="input-field">
+                <input type="text" id="user_input" name="user_input" placeholder="Type your message here..."
+                    class="input-field" autocomplete="off">
                 <button type="submit" class="send-button">Send</button>
             </form>
         </main>
     </div>
+    
     <script type="text/javascript">
         var currentUserID = "{{ user_id }}";
     </script>
     <script src="../static/script.js"></script>
+    <script>
+        // Handle menu dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuButton = document.querySelector('.dropbtn-menu');
+            const dropdownContent = document.querySelector('.dropdown-content-user');
+            
+            if (menuButton && dropdownContent) {
+                menuButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dropdownContent.classList.toggle('show');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!menuButton.contains(e.target) && !dropdownContent.contains(e.target)) {
+                        dropdownContent.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+    
     <footer>
-        <p>&copy; 2023 Test. All rights reserved.</p>
+        <p>&copy; 2024 PersonaVerse. Chat with AI personalities and explore different perspectives.</p>
     </footer>
 </body>
 

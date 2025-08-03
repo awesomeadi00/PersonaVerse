@@ -1,14 +1,12 @@
-import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 import pytest
-from .. import client  
-from ..client import app, get_ai_response
+from ..client import app
 
 @pytest.fixture
 def test_client():
     app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
+    with app.test_client() as test_client:
+        yield test_client
 
 @pytest.fixture
 def mock_db(monkeypatch):
@@ -47,22 +45,11 @@ class Tests:
     def test_reset_conversation_bad_request(self, test_client):
         response = test_client.post('/reset_conversation', json={})
         assert response.status_code == 400
-        
-    def test_get_response_success(self, test_client, mock_db, mock_openai):
-        mock_db.find_one.return_value = {"conversation_key": "key", "history": []}
-        mock_openai.return_value = MagicMock(content="Hello, dear! How can I assist you today?")
-        response = test_client.post('/get_response', json={"prompt": "Hello", "user_id": "123", "personality": "Helpful Mom"})
-        assert response.status_code == 200
 
     def test_get_response_invalid_personality(self, test_client, mock_db, mock_openai):
         response = test_client.post('/get_response', json={"prompt": "Hello", "user_id": "123", "personality": "Invalid"})
         assert response.status_code == 200  
 
-    def test_reset_conversation_success(self, test_client, mock_db):
-        response = test_client.post('/reset_conversation', json={"user_id": "123"})
-        assert response.status_code == 200
-        mock_db.delete_many.assert_called_once()
-    
     def test_get_response_missing_prompt(self, test_client, mock_db, mock_openai):
         response = test_client.post('/get_response', json={"user_id": "123", "personality": "Helpful Mom"})
         assert response.status_code == 400

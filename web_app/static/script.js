@@ -11,7 +11,7 @@ $(document).ready(function () {
         $('.chat-box').empty();
         messages.forEach(msg => {
             const messageClass = msg.type === 'user' ? 'message user' : 'message ai';
-            $('.chat-box').append('<div class="' + messageClass + '">' + msg.content + '</div>');
+            $('.chat-box').append('<div class="' + messageClass + '"><div class="message-content">' + msg.content + '</div></div>');
         });
         scrollToBottom();
     }

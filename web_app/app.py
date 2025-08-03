@@ -1,5 +1,5 @@
 """
-This is a web-app ... 
+This is the backend of the web application
 """
 import os
 import logging
@@ -11,7 +11,6 @@ from flask_session import Session
 from requests.exceptions import RequestException
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
-import mongomock
 
 load_dotenv()
 
@@ -29,7 +28,21 @@ try:
     db = client["database"]
     collection = db["chat"]
     user_collection = db["users"]
+    
+    # Ensure collections exist (MongoDB creates them automatically, but this makes it explicit)
+    if "chat" not in db.list_collection_names():
+        db.create_collection("chat")
+        logging.info("Created 'chat' collection")
+    
+    if "users" not in db.list_collection_names():
+        db.create_collection("users")
+        logging.info("Created 'users' collection")
+    
+    logging.info("Database connection established successfully")
+    logging.info(f"Available collections: {db.list_collection_names()}")
+    
 except Exception as e:
+    logging.error(f"Database connection error: {e}")
     print(e)
 
 # def get_db_client(use_mock_db=False):
@@ -170,57 +183,75 @@ def signup():
     if "user_id" in session:
         return redirect(url_for("index"))
 
-    # If there is no account, then we allow the user to creat one.
+    # Check if database is connected
+    if user_collection is None:
+        return render_template("signup.html", errors=["Database connection error. Please try again later."])
+
+    # If there is no account, then we allow the user to create one.
     if request.method == "POST":
-        # We allow the user to create their username, password, confirm password, email
-        username = request.form["username"]
-        password = request.form["password"]
-        confirm_password = request.form["confirm_password"]
-        email = request.form["email"]
-        errors = []
+        try:
+            # We allow the user to create their username, password, confirm password, email
+            username = request.form["username"]
+            password = request.form["password"]
+            confirm_password = request.form["confirm_password"]
+            email = request.form["email"]
+            errors = []
 
-        # This checks if there is already a user that has this exact username
-        if user_collection.find_one({"username": username}):
-            errors.append("Username already exists!")
+            # This checks if there is already a user that has this exact username
+            if user_collection.find_one({"username": username}):
+                errors.append("Username already exists!")
+                logging.info("Username already exists error")
 
-        # This checks if there is already a user that has this exact email
-        elif user_collection.find_one({"email": email}):
-            errors.append("Email already used, try another or try logging in!")
+            # This checks if there is already a user that has this exact email
+            elif user_collection.find_one({"email": email}):
+                errors.append("Email already used, try another or try logging in!")
+                logging.info("Email already exists error")
 
-        # This checks if the password is in between 8-20 characters
-        elif not 8 <= len(password) <= 20:
-            errors.append("Password must be between 8 and 20 characters long!")
+            # This checks if the password is in between 8-20 characters
+            elif not 8 <= len(password) <= 20:
+                errors.append("Password must be between 8 and 20 characters long!")
+                logging.info("Password length error")
 
-        # This checks if the password does not have any numbers
-        elif not any(char.isdigit() for char in password):
-            errors.append("Password should have at least one number!")
+            # This checks if the password does not have any numbers
+            elif not any(char.isdigit() for char in password):
+                errors.append("Password should have at least one number!")
+                logging.info("Password missing number error")
 
-        # This checks if the password does not have any alphabets
-        elif not any(char.isalpha() for char in password):
-            errors.append("Password should have at least one alphabet!")
+            # This checks if the password does not have any alphabets
+            elif not any(char.isalpha() for char in password):
+                errors.append("Password should have at least one alphabet!")
+                logging.info("Password missing letter error")
 
-        # This checks if the password and the confirm password do not match
-        elif not confirm_password == password:
-            errors.append("Passwords do not match!")
+            # This checks if the password and the confirm password do not match
+            elif not confirm_password == password:
+                errors.append("Passwords do not match!")
+                logging.info("Password mismatch error")
 
-        # If any errors, it will re-render the signup.html page and allow the user to try again
-        if errors:
-            return render_template("signup.html", errors=errors)
+            # If any errors, it will re-render the signup.html page and allow the user to try again
+            if errors:
+                logging.info(f"Signup failed with errors: {errors}")
+                return render_template("signup.html", errors=errors)
 
-        # If user managed to create a proper account, it will generate a hash for their password
-        password_hash = generate_password_hash(password)
+            # If user managed to create a proper account, it will generate a hash for their password
+            password_hash = generate_password_hash(password)
 
-        # Here we insert their account details to the database
-        user_collection.insert_one(
-            {
-                "username": username,
-                "password": password_hash,
-                "email": email,
-            }
-        )
+            # Here we insert their account details to the database
+            result = user_collection.insert_one(
+                {
+                    "username": username,
+                    "password": password_hash,
+                    "email": email,
+                }
+            )
+            
+            logging.info(f"User created successfully with ID: {result.inserted_id}")
 
-        # This redirects the user to the login page where they must login to access the webpage.
-        return redirect(url_for("login"))
+            # This redirects the user to the login page where they must login to access the webpage.
+            return redirect(url_for("login"))
+            
+        except Exception as e:
+            logging.error(f"Error during signup: {e}")
+            return render_template("signup.html", errors=["An error occurred during signup. Please try again."])
 
     # Renders the signup.html page
     return render_template("signup.html")
@@ -243,27 +274,35 @@ def login_auth():
     if "user_id" in session:
         return redirect(url_for("index"))
 
+    # Check if database is connected
+    if user_collection is None:
+        return render_template("login.html", errors=["Database connection error. Please try again later."])
+
     # Else, ask them to login by inputting a username and password
     if request.method == "POST":
-        username = request.form["username"]
-        password = request.form["password"]
-        session["username"] = username
+        try:
+            username = request.form["username"]
+            password = request.form["password"]
+            session["username"] = username
 
-        errors = []
+            errors = []
 
-        # Once inputted their username and password, check the database for existing users
-        user = user_collection.find_one({"username": username})
+            # Once inputted their username and password, check the database for existing users
+            user = user_collection.find_one({"username": username})
 
-        # We provide the _id attribute of the user to the user_id in the session
-        if user and check_password_hash(user["password"], password):
-            # User sessions to keep track of who's logged in
-            session["user_id"] = str(user["_id"])
-            return redirect(url_for("index"))
+            # We provide the _id attribute of the user to the user_id in the session
+            if user and check_password_hash(user["password"], password):
+                # User sessions to keep track of who's logged in
+                session["user_id"] = str(user["_id"])
+                return redirect(url_for("index"))
 
-        # If the username or password does not match we render the login.html template once more
-        errors.append("Invalid username or password!")
-        return render_template("login.html", errors=errors)
-    return None
+            # If the username or password does not match we render the login.html template once more
+            errors.append("Invalid username or password!")
+            return render_template("login.html", errors=errors)
+        except Exception as e:
+            logging.error(f"Error during login: {e}")
+            return render_template("login.html", errors=["An error occurred during login. Please try again."])
+    return render_template("login.html", errors=["Invalid request method"])
 
 
 @app.route('/forgot_password', methods = ['GET','POST'])

@@ -1,5 +1,5 @@
 """
-This module handles ... 
+This service handles all calls regarding OpenAI LLM and the various personality chatbots
 """
 import os
 import logging

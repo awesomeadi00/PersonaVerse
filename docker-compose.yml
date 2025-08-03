@@ -1,23 +1,22 @@
-version: "3"
 services:
   web-app:
     build:
       context: ./web_app
       dockerfile: Dockerfile
-    image: angstisdocker/webapp:latest
-    container_name: web-app-container
+    image: awesomeadi00/webapp:latest
+    container_name: personaverse-webapp-container
     ports:
       - "5001:5000"
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
-    image: angstisdocker/client:latest
-    container_name: client-container
+    image: awesomeadi00/client:latest
+    container_name: personaverse-client-container
     ports:
       - "5002:5002"
   database:
-    image: mongo:4.0-xenial
+    image: mongo:4.2
     ports:
       - "27017:27017"
     volumes:

@@ -1,42 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Chat</title>
+    <title>Login - PersonaVerse</title>
+    <link rel="icon" type="image/png" href="static/favicon.png">
     <link rel="stylesheet" type="text/css" href="static/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Login to PersonaVerse and start chatting with AI personalities">
 </head>
 
-{% block container %}
+<body>
     <div class="content">
-        <h1> Login </h1>
-
-        <!-- When they are on the login.html page, it will show this form but when they press submit, it will actuate the login_auth() function from the backend.  -->
-        <form method="POST" action="{{url_for('login_auth')}}">
-            <label for="username">Username: </label>
-            <input type="text" name="username" id="username" required><br>
-
-            <label for="password">Password: </label>
-            <input type="password" name="password" id="password" required><br>
-
-            <button type="submit" name="submit" value="Login">Login</button>
+        <h1>Welcome to PersonaVerse</h1>
+        
+        <form method="POST" action="/login_auth">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required autocomplete="username">
+            
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required autocomplete="current-password">
+            
+            <button type="submit">Login</button>
         </form>
-
-        <!-- If they users don't have an account, it simply allows them to click and call the signup() function which renders the signup.html file. -->
-        <p>Don't have an account? <a href="{{url_for('signup')}}">Sign Up</a></p>
-        <p>Forgot Password? <a href="{{url_for('forgot_password')}}">Reset</a></p>
+        
+        <p style="text-align: center; margin-top: 1.5rem;">
+            Don't have an account? <a href="/signup">Sign up</a>
+        </p>
+        
+        <p style="text-align: center; margin-top: 1rem;">
+            <a href="/forgot_password">Forgot your password?</a>
+        </p>
     </div>
 
-    <!-- If there are any errors it makes sure -->
     {% if errors %}
-        <div class="alert">
-            <ul>
-                {% for message in errors %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}   
-{% endblock %}
-
+    <div class="alert">
+        <ul>
+            {% for message in errors %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</body>
 </html>
