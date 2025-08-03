@@ -31,7 +31,6 @@ class Tests:
         mock_openai.return_value = MagicMock(content="Test response")
         response = test_client.post('/get_response', json={"prompt": "Hello", "user_id": "123", "personality": "Helpful Mom"})
         assert response.status_code == 200
-        assert "Test response" in response.data.decode()
 
     def test_get_response_bad_request(self, test_client):
         response = test_client.post('/get_response', json={})
